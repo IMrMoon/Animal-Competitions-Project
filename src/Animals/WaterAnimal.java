@@ -15,14 +15,14 @@ import Olympics.Medal;
             this.diveDept = diveDept;
         }
 
-        @Override
-        public void move() {
-            if (getEnergyLevel() <= 0) return;
-
-            getPosition().setX(getPosition().getX() + (int) getSpeed());
-            setEnergyLevel(getEnergyLevel() - getEnergyPerMeter());
-            animalDistance += getSpeed();
-        }
+//        @Override
+//        public void move() {
+//            if (getEnergyLevel() <= 0) return;
+//
+//            getPosition().setX(getPosition().getX() + (int) getSpeed());
+//            setEnergyLevel(getEnergyLevel() - getEnergyPerMeter());
+//            animalDistance += getSpeed();
+//        }
 
         public double Dive(double dive) {
             if (diveDept + dive < MAX_DIVE) {

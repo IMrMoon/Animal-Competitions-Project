@@ -51,7 +51,7 @@ public abstract class AirAnimal extends Animal {
      */
     public AirAnimal(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
                      double animalDistance, String sound, double wingspan, CompetitionPanel pan, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, animalDistance, sound, pan, "Water", specificAnimal);
+        super(animalName, animalGender, weight, speed, medalsArray, position, animalDistance, sound, pan, "Air", specificAnimal);
         this.wingspan = wingspan;
     }
 
@@ -59,14 +59,14 @@ public abstract class AirAnimal extends Animal {
      * Moves the air animal by updating its position and energy level.
      * If the energy level is zero or less, the animal does not move.
      */
-    @Override
-    public void move() {
-        if (getEnergyLevel() <= 0) return;
-
-        getPosition().setX(getPosition().getX() + (int) getSpeed());
-        setEnergyLevel(getEnergyLevel() - getEnergyPerMeter());
-        animalDistance += getSpeed();
-    }
+//    @Override
+//    public void move() {
+//        if (getEnergyLevel() <= 0) return;
+//
+//        getPosition().setX(getPosition().getX() + (int) getSpeed());
+//        setEnergyLevel(getEnergyLevel() - getEnergyPerMeter());
+//        animalDistance += getSpeed();
+//    }
 
     /**
      * Constructs a new {@code AirAnimal} with default values.
@@ -111,4 +111,5 @@ public abstract class AirAnimal extends Animal {
     public String toString() {
         return super.toString() + ", wingspan: " + wingspan;
     }
+
 }

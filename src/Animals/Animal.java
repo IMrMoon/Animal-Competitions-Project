@@ -478,4 +478,20 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
             currentEnergy += energy;
         return true;
     }
+
+    @Override
+    public void move() {
+        Point pos = getPosition();
+        int speed = (int) getSpeed();
+
+        int panelWidth = pan.getWidth();
+
+        if (orien == Orientation.east) {
+            pos.setX(pos.getX() + speed); // Increase horizontal movement
+            if (pos.getX() >= panelWidth - 350) { // גבול ימני של הפאנל
+                pos.setX(panelWidth - 350);
+            }
+        }
+        setPosition(pos);
+    }
 }

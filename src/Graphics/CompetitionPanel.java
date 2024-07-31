@@ -57,6 +57,7 @@ import java.util.List;
 public class CompetitionPanel extends JPanel {
     int numOfCreatedAnimals = 0;
     private List<Animal> animalList = new ArrayList<>();
+    private List<Animal> allAnimals = new ArrayList<>();
     private static String selectedCompetitionType = null;
     private static String selectedAnimalType;
     private static String selectedAnimal;
@@ -126,9 +127,6 @@ public class CompetitionPanel extends JPanel {
                 for (Animal animal : animalList) {
                     if (animal != null) {
                         animal.drawObject(g2d);
-//                        animal.setPosition(new Point((int)(backgroundImg.getWidth()/8.5), (int)(backgroundImg.getHeight()/8.5)));
-
-//                        animal.move();
                     }
                 }
             }
@@ -158,6 +156,7 @@ public class CompetitionPanel extends JPanel {
                     }
                     if (selectedAnimal != null) {
                         animalList.add(AddAnimalDialog.selectedAnimalObj);
+                        allAnimals.add(AddAnimalDialog.selectedAnimalObj);
                         backgroundPanel.revalidate();
                         backgroundPanel.repaint();
                         numOfCreatedAnimals++;
@@ -203,6 +202,7 @@ public class CompetitionPanel extends JPanel {
                             animalList.remove(chosenObj);
                             backgroundPanel.revalidate();
                             backgroundPanel.repaint();
+                            clearDialog.dispose();
                         }
                         else {
                             JOptionPane.showMessageDialog(clearPanel, "Please Choose an animal from the list!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -283,7 +283,7 @@ public class CompetitionPanel extends JPanel {
         InfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (animalList != null && !animalList.isEmpty()) {
+                if (allAnimals != null && !allAnimals.isEmpty()) {
                     if (infoDialog == null) {
                         infoDialog = new JDialog();
                         infoDialog.setTitle("Info");
@@ -291,16 +291,18 @@ public class CompetitionPanel extends JPanel {
                         infoDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                         infoDialog.setLocationRelativeTo(null);
 
-                        Object[][] animalsData = convertListTo2DArray(animalList);
-                        infoTable = new JTable(animalsData, columnNames);
+//                        Object[][] animalsData = convertListTo2DArray(animalList);
+                        Object[][] allAnimalsData = convertListTo2DArray(allAnimals);
+                        infoTable = new JTable(allAnimalsData, columnNames);
                         infoScroller = new JScrollPane(infoTable);
                         infoDialog.add(infoScroller);
+
                     } else {
                         updateTable();
                     }
                     infoDialog.setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(InfoButton, "Please Add Animals, Empty Table", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(backgroundPanel, "Please Add Animals, Empty Table", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -406,7 +408,7 @@ public class CompetitionPanel extends JPanel {
      */
     private void updateTable() {
         if (infoTable != null) {
-            Object[][] animalsData = convertListTo2DArray(animalList);
+            Object[][] animalsData = convertListTo2DArray(allAnimals);
             infoTable.setModel(new javax.swing.table.DefaultTableModel(animalsData, columnNames));
         }
     }
