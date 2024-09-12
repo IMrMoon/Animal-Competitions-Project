@@ -16,6 +16,8 @@ import javax.swing.*;
 
 
 /**
+ * Segev Chen 322433400
+ * Yinon Alfasi 208810374
  * The {@code CompetitionFrame} class represents the main window for the animal competition.
  * It sets up the frame, menu bar, and the main competition panel where animals are displayed and managed.
  *
@@ -91,6 +93,10 @@ public class CompetitionFrame extends JFrame  {
 
    }
 
+   public CompetitionPanel getCompetitionPanel() {
+       return competitionPanel;
+   }
+
 
     /**
      * The main method to run the application.
@@ -99,6 +105,5 @@ public class CompetitionFrame extends JFrame  {
      */
    public static void main(String[] args) {
        new CompetitionFrame();
-
    }
 }

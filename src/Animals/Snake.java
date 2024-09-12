@@ -58,8 +58,8 @@ public class Snake extends TerrestrialAnimals implements IReptile {
      * @param specificAnimal The specific category of the animal.
      */
     public Snake(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position, CompetitionPanel pan,
-                 poisonous poison, double length, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "ssssssss", 0 , pan, specificAnimal);
+                 poisonous poison, double length, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "ssssssss", 0 , pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.poison = poison;
         this.length = length;
         loadImages("y");
@@ -130,15 +130,7 @@ public class Snake extends TerrestrialAnimals implements IReptile {
         return setPosition(p);
     }
 
-    /**
-     * Returns the name of the snake.
-     *
-     * @return The name of the snake.
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
+
 
     /**
      * Loads the images for the snake based on the specified name.

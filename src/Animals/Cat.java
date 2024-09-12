@@ -52,8 +52,8 @@ public class Cat extends TerrestrialAnimals {
      * @param specificAnimal The specific category of the animal.
      */
     public Cat(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-               int noLegs,CompetitionPanel pan, boolean Castrated, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Meow", noLegs,pan, specificAnimal);
+               int noLegs,CompetitionPanel pan, boolean Castrated, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Meow", noLegs,pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.Castrated = Castrated;
         loadImages("y");
     }
@@ -80,16 +80,6 @@ public class Cat extends TerrestrialAnimals {
         return false;
     }
 
-
-    /**
-     * Returns the name of the cat.
-     *
-     * @return The name of the cat.
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
 
     /**

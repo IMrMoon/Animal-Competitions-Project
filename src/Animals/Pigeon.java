@@ -34,8 +34,8 @@ public class Pigeon extends AirAnimal {
      * @param specificAnimal the specific category of the animal
      */
     public Pigeon(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                  double wingspan,CompetitionPanel pan ,String family, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Arr-rar-rar-rar-raah", wingspan, pan, specificAnimal);
+                  double wingspan,CompetitionPanel pan ,String family, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Arr-rar-rar-rar-raah", wingspan, pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.family = family;
         loadImages("graphics2/pigeon_east.jpg");
     }
@@ -97,15 +97,6 @@ public class Pigeon extends AirAnimal {
         return false;
     }
 
-    /**
-     * Returns the name of the pigeon.
-     *
-     * @return the name of the pigeon
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
     /**
      * Loads the images for the pigeon based on the specified name.

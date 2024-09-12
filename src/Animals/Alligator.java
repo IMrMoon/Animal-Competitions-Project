@@ -42,11 +42,11 @@ public class Alligator extends WaterAnimal implements IReptile, LandAnimal {
      * @param specificAnimal the specific category of the animal
      */
     public Alligator(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                     double diveDept,CompetitionPanel pan, String areaOfLiving, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Roar", diveDept, pan, specificAnimal); // צליל המגורר על ידי נחישות
+                     double diveDept,CompetitionPanel pan, String areaOfLiving, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Roar", diveDept, pan, specificAnimal, groupName, totalEnergy, energyPerMeter); // צליל המגורר על ידי נחישות
         this.areaOfLiving = areaOfLiving;
         loadImages("g");
-        this.landAnimalDelegate = new TerrestrialAnimals(animalName, animalGender, weight, speed, medalsArray, position, 0, "Roar", 4, pan, specificAnimal) {
+        this.landAnimalDelegate = new TerrestrialAnimals(animalName, animalGender, weight, speed, medalsArray, position, 0, "Roar", 4, pan, "Terrestrial", groupName, totalEnergy, energyPerMeter) {
 
             /**
              * @param nm
@@ -58,14 +58,6 @@ public class Alligator extends WaterAnimal implements IReptile, LandAnimal {
                    setImg3("graphics2/alli_west.jpg");
                    setImg4("graphics2/alli_north.jpg");
             }
-            /**
-             * @return
-             */
-            @Override
-            public String getAnimaleName() {
-                return animalName;
-            }
-
             /**
              * Returns the current location of the object.
              *
@@ -142,15 +134,6 @@ public class Alligator extends WaterAnimal implements IReptile, LandAnimal {
         return 4;
     }
 
-    /**
-     * Returns the name of the alligator.
-     *
-     * @return the name of the alligator
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
     /**
      * Indicates whether some other object is "equal to" this one.

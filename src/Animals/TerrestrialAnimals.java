@@ -7,7 +7,10 @@ import Graphics.IMoveable;
 import Mobility.Point;
 import Olympics.Medal;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.InputMismatchException;
 
@@ -51,8 +54,8 @@ public abstract class TerrestrialAnimals extends Animal {
      * @param specificAnimal The specific category of the animal.
      */
     public TerrestrialAnimals(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                              double animalDistance, String sound, int noLegs, CompetitionPanel pan, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, animalDistance, sound, pan, "Terrestrial", specificAnimal);
+                              double animalDistance, String sound, int noLegs, CompetitionPanel pan, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, animalDistance, sound, pan, "Terrestrial", specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.noLegs = noLegs;
         loadImages("y");
     }
@@ -97,39 +100,55 @@ public abstract class TerrestrialAnimals extends Animal {
 
     @Override
     public void move() {
+        double currentDistance = 0;
+
         Point pos = getPosition();
         int speed = (int) getSpeed();
+        int panelWidth = pan.getBackgroundImg().getWidth();
+        int panelHeight = pan.getBackgroundImg().getHeight();
 
-        int panelWidth = pan.getWidth();
-        int panelHeight = pan.getHeight();
+        // בדיקת אנרגיה לפני התנועה
+        if (getCurrentEnergy() - (int) ((getSpeed() / METER) * getEnergyPerMeter()) < 0) {
+            return; // אין מספיק אנרגיה לתנועה
+        }
 
-
+        // תנועה בהתאם לכיוון הנוכחי
         if (orien == Orientation.east) {
-            pos.setX(pos.getX() + speed); // Increase horizontal movement
-            if (pos.getX() >= panelWidth - 350) { // גבול ימני של הפאנל
-                pos.setX(panelWidth - 350);
+            pos.setX(pos.getX() + speed); // תנועה ימינה
+            if (pos.getX() >= panelWidth - (getSize() * 2)) { // גבול ימני
+                pos.setX(panelWidth - (getSize()));
                 orien = Orientation.south;
             }
         } else if (orien == Orientation.south) {
-            pos.setY(pos.getY() + speed); // Increase vertical movement
-            if (pos.getY() >= panelHeight +65) { // גבול תחתון של הפאנל
-                pos.setY(panelHeight +65);
+            pos.setY(pos.getY() + speed); // תנועה למטה
+            if (pos.getY() >= panelHeight - (getSize() * 2)) { // גבול תחתון
+                pos.setY(panelHeight - (getSize()));
                 orien = Orientation.west;
             }
         } else if (orien == Orientation.west) {
-            pos.setX((pos.getX() - speed)); // Decrease horizontal movement
-            if (pos.getX() <= speed) { // גבול שמאלי של הפאנל
-                pos.setX(0);
+            pos.setX(pos.getX() - speed); // תנועה שמאלה
+            if (pos.getX() <= (getSize() * 2)) { // גבול שמאלי
+                pos.setX(getSize());
                 orien = Orientation.north;
             }
         } else if (orien == Orientation.north) {
-            pos.setY(pos.getY() - speed); // Decrease vertical movement
-            if (pos.getY() <= 65) { // גבול עליון של הפאנל
-                pos.setY(0);
-                orien = Orientation.east;
+            pos.setY(pos.getY() - speed); // תנועה למעלה
+            if (pos.getY() <= getSize() - speed) { // גבול עליון
+                pos.setY(getSize() - speed);
             }
         }
 
+        // עדכון האנרגיה הנוכחית
+        setCurrentEnergy(getCurrentEnergy() - (int) (((getSpeed() / METER) * getEnergyPerMeter())));
+
+        // חישוב המרחק שהחיה עברה
+        currentDistance = calcDistance(pos);
+        this.addAnimalDistance(currentDistance);
+
+        // עדכון המיקום הנוכחי של החיה
         setPosition(pos);
     }
+
+
 }
+

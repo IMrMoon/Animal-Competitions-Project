@@ -1,7 +1,10 @@
 package Graphics;
 
 import Animals.Animal;
-import Mobility.Point;
+import Competitions.CourierTournament;
+import Competitions.RegularTournament;
+import Competitions.ScoreKeeper;
+import Competitions.Scores;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,10 +12,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 
 /**
+ * Segev Chen 322433400
+ * Yinon Alfasi 208810374
  * The {@code CompetitionPanel} class represents a panel for managing and displaying animal competitions.
  * It provides functionalities to add competitions, add animals, clear animals, feed animals, display animal information, and start the competition.
  *
@@ -57,22 +66,32 @@ import java.util.List;
 public class CompetitionPanel extends JPanel {
     int numOfCreatedAnimals = 0;
     private List<Animal> animalList = new ArrayList<>();
-    private List<Animal> allAnimals = new ArrayList<>();
+
+    private List<List<Animal>> RegularCompetitionsGroupsList = new ArrayList<>();
+    private List<List<Animal>> RelayCompetitionsGroupsList = new ArrayList<>();
+
+    private List<Animal> RegularAnimalListAlone;
+
+
     private static String selectedCompetitionType = null;
+    private static String selectedCompetitionRelayOrRegular = null;
     private static String selectedAnimalType;
     private static String selectedAnimal;
-    private JLabel animalLabel;
     private JTable infoTable;
     private JScrollPane infoScroller;
     private JDialog infoDialog;
-    String[] columnNames = {"Animal", "Category", "Type", "Speed", "energyAmount", "Distance", "Energy consumption"};
+    private JDialog middleAddAnimalDialog;
+    String[] columnNames = {"Animal", "Category", "Type", "Speed", "energyAmount", "Distance", "Energy consumption","Group Name", "Finish Time"};
     int EnergyConsumption = 0;
     private CompetitionPanel pan;
     private BufferedImage backgroundImg;
     private JPanel backgroundPanel;
-    int preferredWidth = 1024;
-    int preferredHeight = 768;
+    int preferredWidth;
+    int preferredHeight;
     private Timer timer;
+    private int numOfAnimalsInGroup;
+    private String groupName;
+
 
     /**
      * Returns the list of animals.
@@ -83,6 +102,18 @@ public class CompetitionPanel extends JPanel {
         return animalList;
     }
 
+
+    public List<List<Animal>> getRegularCompetitionsGroupsList() {
+        return RegularCompetitionsGroupsList;
+    }
+
+    public List<List<Animal>> getRelayCompetitionsGroupsList() {
+        return RelayCompetitionsGroupsList;
+    }
+
+    public int getNumOfCreatedAnimals(){
+        return numOfCreatedAnimals;
+    }
 
     /**
      * Returns the background panel.
@@ -110,6 +141,8 @@ public class CompetitionPanel extends JPanel {
     public CompetitionPanel(BufferedImage backgroundImg) {
         this.pan = this;
         this.backgroundImg = backgroundImg;
+        this.preferredWidth = backgroundImg.getWidth();
+        this.preferredHeight = backgroundImg.getHeight();
 
         setLayout(new BorderLayout());
 
@@ -126,7 +159,11 @@ public class CompetitionPanel extends JPanel {
                 g2d.scale(scaleX, scaleY);
                 for (Animal animal : animalList) {
                     if (animal != null) {
-                        animal.drawObject(g2d);
+                        synchronized (animal){
+
+                            animal.drawObject(g2d);
+                        }
+
                     }
                 }
             }
@@ -141,31 +178,55 @@ public class CompetitionPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 AddCompetitionDialog competitionDialog = new AddCompetitionDialog();
                 selectedCompetitionType = competitionDialog.getSelectedCompetitionType();
+                selectedCompetitionRelayOrRegular = competitionDialog.getSelectedCompetitionRelayOrRegular();
+
             }
         });
+
+
 
         JButton AddAnimalButton = new JButton("Add Animal");
         AddAnimalButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (selectedCompetitionType != null) {
-                    AddAnimalDialog addAnimalDialog = new AddAnimalDialog(selectedCompetitionType, pan);
-                    if (addAnimalDialog.getSelectedAnimalType() != null && addAnimalDialog.getSelectedAnimal() != null) {
-                        selectedAnimalType = addAnimalDialog.getSelectedAnimalType();
-                        selectedAnimal = addAnimalDialog.getSelectedAnimal();
+
+                if (selectedCompetitionType != null)
+                {
+                    if (selectedCompetitionRelayOrRegular.equals("Relay"))
+                    {
+                        addMiddleAddAnimalDialog();
                     }
-                    if (selectedAnimal != null) {
-                        animalList.add(AddAnimalDialog.selectedAnimalObj);
-                        allAnimals.add(AddAnimalDialog.selectedAnimalObj);
-                        backgroundPanel.revalidate();
-                        backgroundPanel.repaint();
-                        numOfCreatedAnimals++;
-                    } else {
-                        JOptionPane.showMessageDialog(AddAnimalButton, "Please Select Competition Type", "Error", JOptionPane.ERROR_MESSAGE);
+                    else if (selectedCompetitionRelayOrRegular.equals("Regular"))
+                    {
+                        RegularAnimalListAlone = new ArrayList<>();
+                        AddAnimalDialog addAnimalDialog = new AddAnimalDialog(selectedCompetitionType, pan);
+                        if (addAnimalDialog.getSelectedAnimalType() != null && addAnimalDialog.getSelectedAnimal() != null) {
+                            selectedAnimalType = addAnimalDialog.getSelectedAnimalType();
+                            selectedAnimal = addAnimalDialog.getSelectedAnimal();
+                        }
+                        if (selectedAnimal != null) {
+                            RegularAnimalListAlone.add(addAnimalDialog.getSelectedAnimalObj());
+                            setEnabled(false);
+                            animalList.add(addAnimalDialog.getSelectedAnimalObj());
+
+                            RegularCompetitionsGroupsList.add(RegularAnimalListAlone);
+
+                            for (List<Animal> group : RegularCompetitionsGroupsList) {
+                                new SetAnimalLocationRelay(group, pan);
+                            }
+
+
+                            backgroundPanel.revalidate();
+                            backgroundPanel.repaint();
+                            numOfCreatedAnimals++;
+                        } else {
+                            JOptionPane.showMessageDialog(AddAnimalButton, "Please Select Animal", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 } else {
                     JOptionPane.showMessageDialog(AddAnimalButton, "Please Select Competition Type", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+
             }
         });
 
@@ -219,7 +280,7 @@ public class CompetitionPanel extends JPanel {
         EatButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (AddAnimalDialog.selectedAnimalObj != null) {
+                if (AddAnimalDialog.getSelectedAnimalObjStatic() != null) {
                     JPanel eatPanel = new JPanel();
                     eatPanel.setLayout(new BoxLayout(eatPanel, BoxLayout.Y_AXIS));
                     eatPanel.setSize(300, 500);
@@ -283,16 +344,15 @@ public class CompetitionPanel extends JPanel {
         InfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (allAnimals != null && !allAnimals.isEmpty()) {
+                if (animalList != null && !animalList.isEmpty()) {
                     if (infoDialog == null) {
                         infoDialog = new JDialog();
                         infoDialog.setTitle("Info");
                         infoDialog.setSize(500, 300);
-                        infoDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                        infoDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                         infoDialog.setLocationRelativeTo(null);
 
-//                        Object[][] animalsData = convertListTo2DArray(animalList);
-                        Object[][] allAnimalsData = convertListTo2DArray(allAnimals);
+                        Object[][] allAnimalsData = convertListTo2DArray(animalList);
                         infoTable = new JTable(allAnimalsData, columnNames);
                         infoScroller = new JScrollPane(infoTable);
                         infoDialog.add(infoScroller);
@@ -320,18 +380,16 @@ public class CompetitionPanel extends JPanel {
         PlayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                timer = new Timer(100, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        for (Animal animal : animalList) {
-                            if (animal != null) {
-                                animal.move();
-                            }
-                        }
-                        backgroundPanel.repaint();
-                    }
-                });
-                timer.start();
+                AddAnimalButton.setEnabled(false);
+                AddCompetitionButton.setEnabled(false);
+                Scores scores = new Scores();
+                if (RelayCompetitionsGroupsList != null || RelayCompetitionsGroupsList.size() > 0) {
+                    CourierTournament courierTournament = new CourierTournament(RelayCompetitionsGroupsList, pan, scores);
+
+                }
+                if (RegularCompetitionsGroupsList != null || RegularCompetitionsGroupsList.size() > 0) {
+                    RegularTournament regularTournament = new RegularTournament(RegularCompetitionsGroupsList, pan, scores);
+                }
             }
         });
 
@@ -389,16 +447,23 @@ public class CompetitionPanel extends JPanel {
      * @return a 2D array representing the animal data.
      */
     private Object[][] convertListTo2DArray(List<Animal> animals) {
-        Object[][] data = new Object[animals.size()][7];
+        Scores scores = ScoreKeeper.getScores();
+        Map<String, Date> scoresMap = scores.getAll();
+        Object[][] data = new Object[animals.size()][9];
         for (int i = 0; i < animals.size(); i++) {
             Animal animal = animals.get(i);
-            data[i][0] = animal.getName();
+            data[i][0] = animal.getAnimalName();
             data[i][1] = animal.getAnimalType();
             data[i][2] = animal.getSpecificAnimal();
             data[i][3] = animal.getSpeed();
             data[i][4] = animal.getEnergyLevel();
             data[i][5] = animal.getAnimalDistance();
             data[i][6] = animal.getEnergyConsumption();
+            data[i][7] = animal.getGroupName();
+            if (scoresMap.get(animal.getGroupName()) != null)
+                data[i][8] = scoresMap.get(animal.getGroupName()).toString();
+            else
+                data[i][8] = "";
         }
         return data;
     }
@@ -408,8 +473,10 @@ public class CompetitionPanel extends JPanel {
      */
     private void updateTable() {
         if (infoTable != null) {
-            Object[][] animalsData = convertListTo2DArray(allAnimals);
-            infoTable.setModel(new javax.swing.table.DefaultTableModel(animalsData, columnNames));
+            Object[][] animalsData = convertListTo2DArray(animalList);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                infoTable.setModel(new javax.swing.table.DefaultTableModel(animalsData, columnNames));
+            });
         }
     }
 
@@ -423,7 +490,7 @@ public class CompetitionPanel extends JPanel {
         String[] names = new String[animals.size() + 1];
         names[0] = "Choose..";
         for (int i = 1; i < animals.size() + 1; i++) {
-            names[i] = animals.get(i - 1).getName();
+            names[i] = animals.get(i - 1).getAnimalName();
         }
         return names;
     }
@@ -437,10 +504,110 @@ public class CompetitionPanel extends JPanel {
      */
     public static Animal getAnimalFromName(String animalName, List<Animal> animals) {
         for (int i = 0; i < animals.size(); i++) {
-            if (animals.get(i).getName().equals(animalName)) {
+            if (animals.get(i).getAnimalName().equals(animalName)) {
                 return animals.get(i);
             }
         }
         return null;
+    }
+    public void addMiddleAddAnimalDialog(){
+        numOfAnimalsInGroup = 0;
+        groupName = null;
+        List<Animal> RelayGroupList = new ArrayList<>();
+        middleAddAnimalDialog = new JDialog();
+        middleAddAnimalDialog.setTitle("Add Animal");
+        middleAddAnimalDialog.setSize(400,400);
+        middleAddAnimalDialog.setLayout(new BorderLayout());
+        middleAddAnimalDialog.setLocationRelativeTo(null);
+        middleAddAnimalDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        JPanel middleAddAnimalPanel = new JPanel();
+        middleAddAnimalPanel.setLayout(new BoxLayout(middleAddAnimalPanel, BoxLayout.Y_AXIS));
+
+        JLabel groupNameLabel = new JLabel("Group Name");
+        JTextField groupNameField = new JTextField();
+
+
+        middleAddAnimalPanel.add(groupNameLabel);
+        middleAddAnimalPanel.add(groupNameField);
+
+
+
+        JButton AddAnimalButtonMiddle = new JButton("Add Animal");
+        AddAnimalButtonMiddle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                groupName = groupNameField.getText();
+                groupNameField.setEditable(false);
+                if (!groupNameField.getText().isEmpty()) {
+                        AddAnimalDialog addAnimalDialog = new AddAnimalDialog(selectedCompetitionType, pan);
+                        if (addAnimalDialog.getSelectedAnimalType() != null && addAnimalDialog.getSelectedAnimal() != null) {
+                            selectedAnimalType = addAnimalDialog.getSelectedAnimalType();
+                            selectedAnimal = addAnimalDialog.getSelectedAnimal();
+                        }
+                        if (selectedAnimal != null) {
+                            RelayGroupList.add(addAnimalDialog.getSelectedAnimalObj());
+                            animalList.add(addAnimalDialog.getSelectedAnimalObj());
+                            numOfCreatedAnimals++;
+                            numOfAnimalsInGroup++;
+                        } else {
+                            JOptionPane.showMessageDialog(AddAnimalButtonMiddle, "Please Select Animal", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                     if (numOfAnimalsInGroup == 4){
+                        if (!selectedAnimalType.equals("Terrestrial")){
+                            for (Animal animal : RelayGroupList) {
+                                animal.setLocation(RelayGroupList.getFirst().getLocation());
+                            }
+                        }
+                        new SetAnimalLocationRelay(RelayGroupList, pan);
+                        RelayCompetitionsGroupsList.add(RelayGroupList);
+                        backgroundPanel.revalidate();
+                        backgroundPanel.repaint();
+                        groupName = null;
+                        middleAddAnimalDialog.dispose();
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(AddAnimalButtonMiddle, "Please Enter Group Name", "Warning", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        JButton finishAddAnimalsButton = new JButton("Finish Add Animals");
+        finishAddAnimalsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (RelayGroupList != null && RelayGroupList.size() > 0) {
+                    if (!selectedAnimalType.equals("Terrestrial")){
+                        for (Animal animal : RelayGroupList) {
+                            animal.setLocation(RelayGroupList.getFirst().getLocation());
+                        }
+                    }
+                    new SetAnimalLocationRelay(RelayGroupList, pan);
+                    RelayCompetitionsGroupsList.add(RelayGroupList);
+                    backgroundPanel.revalidate();
+                    backgroundPanel.repaint();
+                    groupName = null;
+                }
+                else{
+                    JOptionPane.showMessageDialog(finishAddAnimalsButton, "Bye, No Group List Created", "Error", JOptionPane.ERROR_MESSAGE);
+                    middleAddAnimalDialog.dispose();
+                }
+                middleAddAnimalDialog.dispose();
+            }
+        });
+
+        middleAddAnimalPanel.add(AddAnimalButtonMiddle);
+        middleAddAnimalPanel.add(finishAddAnimalsButton);
+        middleAddAnimalDialog.add(middleAddAnimalPanel, BorderLayout.CENTER);
+        middleAddAnimalDialog.pack();
+        middleAddAnimalDialog.setVisible(true);
+    }
+    public String getGroupName(){
+        return groupName;
+    }
+
+    public String getSelectedCompetitionType(){
+        return selectedCompetitionType;
     }
 }

@@ -34,8 +34,8 @@ public class Eagle extends AirAnimal {
      * @param altitudeOfFlight the altitude of flight of the eagle
      */
     public Eagle(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                 double wingspan,CompetitionPanel pan, double altitudeOfFlight, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Clack-wack-chack", wingspan, pan, specificAnimal);
+                 double wingspan,CompetitionPanel pan, double altitudeOfFlight, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Clack-wack-chack", wingspan, pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         if (altitudeOfFlight > MAX_ALTITUDE) {
             this.altitudeOfFlight = MAX_ALTITUDE;
         } else {
@@ -89,13 +89,6 @@ public class Eagle extends AirAnimal {
         return setPosition(p);
     }
 
-    /**
-     * @return
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
     /**
      * @param nm

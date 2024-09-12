@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
  */
 public class AddCompetitionDialog {
     private String selectedCompetitionType = null;
+    private String selectedCompetitionRelayOrRegular = null;
 
     /**
      * Returns the selected competition type.
@@ -34,6 +35,10 @@ public class AddCompetitionDialog {
      */
     public String getSelectedCompetitionType() {
         return selectedCompetitionType;
+    }
+
+    public String getSelectedCompetitionRelayOrRegular() {
+        return selectedCompetitionRelayOrRegular;
     }
 
     /**
@@ -59,21 +64,43 @@ public class AddCompetitionDialog {
             }
         });
 
+        JRadioButton relayCompetitionButton = new JRadioButton("Relay");
+        relayCompetitionButton.setSelected(false);
+
+        JRadioButton regularCompetitionButton = new JRadioButton("Regular");
+        relayCompetitionButton.setSelected(false);
+
         competitionAddPanel.add(new JLabel("Choose type of Competition"));
         competitionAddPanel.add(competitionTypeComboBox);
         competitionAddPanel.setSize(100,20);
         competitionAddPanel.setLayout(new FlowLayout());
+        competitionAddPanel.add(relayCompetitionButton);
+        competitionAddPanel.add(regularCompetitionButton);
 
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(relayCompetitionButton.isSelected()) {
+                    if(regularCompetitionButton.isSelected()) {
+                        selectedCompetitionRelayOrRegular = null;
+                    }
+                    else {
+                        selectedCompetitionRelayOrRegular = (String) relayCompetitionButton.getText();
+                    }
+                }
+                else {
+                    if(regularCompetitionButton.isSelected()) {
+                        selectedCompetitionRelayOrRegular = (String)regularCompetitionButton.getText();
+                    }
+                }
+
                 selectedCompetitionType = (String)competitionTypeComboBox.getSelectedItem();
-                if (selectedCompetitionType.equals("Choose..")){
-                    JOptionPane.showMessageDialog(CompetitionDialog, "Choose a Competition Type", "WARNING", JOptionPane.WARNING_MESSAGE);
-                }else{
-                    JOptionPane.showMessageDialog(CompetitionDialog, "Selected competition type: " + selectedCompetitionType, "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (!selectedCompetitionType.equals("Choose..") && !(selectedCompetitionRelayOrRegular == null)){
+                    JOptionPane.showMessageDialog(CompetitionDialog, "Selected competition type: " + selectedCompetitionType + "\nSelected Specific Type: " + selectedCompetitionRelayOrRegular, "Success", JOptionPane.INFORMATION_MESSAGE);
                     CompetitionDialog.dispose();
+                }else{
+                    JOptionPane.showMessageDialog(CompetitionDialog, "Choose a Competition Type", "WARNING", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });

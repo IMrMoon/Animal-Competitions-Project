@@ -20,7 +20,8 @@ public interface IMoveable {
      *
      * @return The name of the moving object.
      */
-    public String getAnimaleName();
+    public String getAnimalName();
+
 
     /**
      * Returns the speed of the moving object.

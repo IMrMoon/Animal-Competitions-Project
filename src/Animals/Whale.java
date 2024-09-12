@@ -37,8 +37,8 @@ public class Whale extends WaterAnimal {
      * @param specificAnimal the specific category of the animal
      */
     public Whale(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                 double diveDept, CompetitionPanel pan, String foodType, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Splash", diveDept, pan, specificAnimal);
+                 double diveDept, CompetitionPanel pan, String foodType, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Splash", diveDept, pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.foodType = foodType;
         loadImages("graphics2/whale_east.jpg");
     }
@@ -88,15 +88,6 @@ public class Whale extends WaterAnimal {
         return setPosition(p);
     }
 
-    /**
-     * Returns the name of the whale.
-     *
-     * @return the name of the whale
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
     /**
      * Loads the images for the whale based on the specified name.

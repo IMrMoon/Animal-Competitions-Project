@@ -36,10 +36,11 @@ import java.awt.event.WindowEvent;
  * </ul>
  */
 public class AddAnimalDialog extends JDialog {
-    String selectedAnimalType = null, selectedAnimal = null;
-    static Animal selectedAnimalObj = null;
-    Point terrestrialPoint = new Point(0, 0);
-    Point AirOrWaterPoint = new Point(0,0);
+    private String selectedAnimalType = null, selectedAnimal = null;
+    private static Animal selectedAnimalObj = null;
+    private Point terrestrialPoint = new Point(0, 0);
+    private Point AirOrWaterPoint = new Point(0,0);
+    private String groupName;
 
     /**
      * Returns the selected animal type.
@@ -59,6 +60,13 @@ public class AddAnimalDialog extends JDialog {
         return selectedAnimal;
     }
 
+    public static Animal getSelectedAnimalObjStatic() {
+        return selectedAnimalObj;
+    }
+
+    public Animal getSelectedAnimalObj() {
+        return selectedAnimalObj;
+    }
 
     /**
      * Constructs a new {@code AddAnimalDialog} with the specified competition type and competition panel.
@@ -67,9 +75,10 @@ public class AddAnimalDialog extends JDialog {
      * @param pan the competition panel.
      */
     public AddAnimalDialog(String selectedCompetitionType, CompetitionPanel pan) {
+        groupName = pan.getGroupName();
         JDialog addAnimalDialog = new JDialog((Frame) null, "Add Animal", true);
         addAnimalDialog.setTitle("Add Animal");
-        addAnimalDialog.setSize(400, 300);
+        addAnimalDialog.setSize(600, 500);
         addAnimalDialog.setLayout(new BorderLayout());
         addAnimalDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -236,6 +245,17 @@ public class AddAnimalDialog extends JDialog {
         animalAddPanel.add(animalSpeedLabel);
         animalAddPanel.add(animalSpeedTextField);
 
+        JLabel energyPerMeter = new JLabel("Energy Per Meter:");
+        JTextField energyPerMeterTextField = new JTextField();
+        animalAddPanel.add(energyPerMeter);
+        animalAddPanel.add(energyPerMeterTextField);
+
+        JLabel maxEnergy = new JLabel("Max Energy :");
+        JTextField maxEnergyTextField = new JTextField();
+        animalAddPanel.add(maxEnergy);
+        animalAddPanel.add(maxEnergyTextField);
+
+
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {
             @Override
@@ -263,8 +283,12 @@ public class AddAnimalDialog extends JDialog {
                     int numberOfLegs = 0;
                     Dolphin.WaterType DolphinWaterType = null;
                     Snake.poisonous poisonous = null;
-
                     int waterRout = 0, airRout = 0;
+                    int energyPerMeter = Integer.parseInt(energyPerMeterTextField.getText());
+                    int maxEnergy = Integer.parseInt(maxEnergyTextField.getText());
+                    if (groupName == null || "".equals(groupName)) {
+                        groupName = animalName;
+                    }
 
 
                     for (Component comp : specificAnimalPanel.getComponents()) {
@@ -310,19 +334,19 @@ public class AddAnimalDialog extends JDialog {
                                         waterRout = Integer.parseInt(text);
                                         switch (waterRout){
                                             case 1: {
-                                                AirOrWaterPoint = new Point((int)(backgroundWidth/14.5), (int)(backgroundHeight/8));
+                                                AirOrWaterPoint = new Point((int)(backgroundWidth/12), (int)(backgroundHeight/12 + backgroundHeight / 16));
                                                 break;
                                             }
                                             case 2: {
-                                                AirOrWaterPoint = new Point((int)(backgroundWidth/14.5), (int)(backgroundHeight/3));
+                                                AirOrWaterPoint = new Point((int)(backgroundWidth/12), (int)(backgroundHeight/4 + backgroundHeight / 10));
                                                 break;
                                             }
                                             case 3: {
-                                                AirOrWaterPoint = new Point((int)(backgroundWidth/14.5), (int)(backgroundHeight/3+backgroundHeight/5));
+                                                AirOrWaterPoint = new Point((int)(backgroundWidth/12), (int)(backgroundHeight/2+backgroundHeight/15));
                                                 break;
                                             }
                                             case 4: {
-                                                AirOrWaterPoint = new Point((int)(backgroundWidth/14.5), (int)(backgroundHeight/3+backgroundHeight/3+backgroundHeight/13));
+                                                AirOrWaterPoint = new Point((int)(backgroundWidth/12), (int)(backgroundHeight/3+backgroundHeight/3+backgroundHeight/8));
                                                 break;
                                             }
                                             default: {
@@ -338,19 +362,19 @@ public class AddAnimalDialog extends JDialog {
                                                 break;
                                             }
                                             case 2: {
-                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/8+backgroundHeight/10));
+                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/8+backgroundHeight/9));
                                                 break;
                                             }
                                             case 3: {
-                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/3+backgroundHeight/10));
+                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/3+backgroundHeight/14+backgroundHeight/15));
                                                 break;
                                             }
                                             case 4: {
-                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/2+backgroundHeight/7));
+                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/2+backgroundHeight/11+backgroundHeight/10));
                                                 break;
                                             }
                                             case 5 :{
-                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/2+backgroundHeight/3));
+                                                AirOrWaterPoint = new Point(0, (int) (backgroundHeight/2+backgroundHeight/3+backgroundHeight/13));
                                                 break;
                                             }
 
@@ -389,35 +413,36 @@ public class AddAnimalDialog extends JDialog {
                     //create the appropriate animal object using the collected data
                     switch (selectedAnimal) {
                         case "Dolphin":
-                            selectedAnimalObj = new Dolphin(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, waterDept, pan, DolphinWaterType, selectedAnimal);
+                            selectedAnimalObj = new Dolphin(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, waterDept, pan, DolphinWaterType, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                         case "Whale":
-                            selectedAnimalObj = new Whale(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, waterDept, pan, WhaleFoodType, selectedAnimal);
+                            selectedAnimalObj = new Whale(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, waterDept, pan, WhaleFoodType, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                         case "Alligator":
                             if (selectedAnimalType.equals("Water")) {
-                                selectedAnimalObj = new Alligator(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, waterDept, pan, AlligatorArea, selectedAnimal);
+                                selectedAnimalObj = new Alligator(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, waterDept, pan, AlligatorArea, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             }
                             if (selectedAnimalType.equals("Terrestrial")) {
-                                selectedAnimalObj = new Alligator(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, 0, pan, AlligatorArea, selectedAnimal);
+                                selectedAnimalObj = new Alligator(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, 0, pan, AlligatorArea, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             }
                             break;
                         case "Eagle":
-                            selectedAnimalObj = new Eagle(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, wingspan, pan, EagleAltitudeFlight, selectedAnimal);
+                            selectedAnimalObj = new Eagle(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, wingspan, pan, EagleAltitudeFlight, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                         case "Pigeon":
-                            selectedAnimalObj = new Pigeon(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, wingspan, pan, pigeonFamily, selectedAnimal);
+                            selectedAnimalObj = new Pigeon(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, AirOrWaterPoint, wingspan, pan, pigeonFamily, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                         case "Dog":
-                            selectedAnimalObj = new Dog(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, numberOfLegs, pan, dogBreed, selectedAnimal);
+
+                            selectedAnimalObj = new Dog(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, numberOfLegs, pan, dogBreed, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                         case "Cat": {
                             boolean ifCastrated = CatCastrated.equals("Yes");
-                            selectedAnimalObj = new Cat(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, numberOfLegs, pan, ifCastrated, selectedAnimal);
+                            selectedAnimalObj = new Cat(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, numberOfLegs, pan, ifCastrated, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                         }
                         case "Snake":
-                            selectedAnimalObj = new Snake(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, pan, poisonous, length, selectedAnimal);
+                            selectedAnimalObj = new Snake(animalName, animalGender, animalWeight, animalSpeed, new Medal[]{}, terrestrialPoint, pan, poisonous, length, selectedAnimal, groupName, maxEnergy, energyPerMeter);
                             break;
                     }
 
@@ -563,9 +588,23 @@ public class AddAnimalDialog extends JDialog {
 
                             case "Number of Legs:":
                                 int intValue = Integer.parseInt(text);
-                                if (intValue <= 1) {
-                                    textField.setBackground(Color.PINK);
-                                    isValid = false;
+
+                                if (selectedAnimal.equals("Snake")) {
+                                    if (intValue == 0) {
+                                        textField.setBackground(Color.WHITE);
+                                        isValid = true;
+                                    } else {
+                                        textField.setBackground(Color.PINK);
+                                        isValid = false;
+                                    }
+                                } else {
+                                    if (intValue > 1) {
+                                        textField.setBackground(Color.WHITE);
+                                        isValid = true;
+                                    } else {
+                                        textField.setBackground(Color.PINK);
+                                        isValid = false;
+                                    }
                                 }
                                 break;
 

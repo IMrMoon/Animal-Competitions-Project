@@ -52,8 +52,8 @@ public class Dog extends TerrestrialAnimals {
      * @param specificAnimal The specific category of the animal.
      */
     public Dog(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-               int noLegs, CompetitionPanel pan, String breed, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Woof Woof", noLegs, pan, specificAnimal);
+               int noLegs, CompetitionPanel pan, String breed, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Woof Woof", noLegs, pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.breed = breed;
         loadImages("h");
     }
@@ -79,15 +79,6 @@ public class Dog extends TerrestrialAnimals {
         return setPosition(p);
     }
 
-    /**
-     * Returns the name of the dog.
-     *
-     * @return The name of the dog.
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
 
     /**

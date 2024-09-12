@@ -43,8 +43,8 @@ public class Dolphin extends WaterAnimal {
      * @param specificAnimal the specific category of the animal
      */
     public Dolphin(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                   double diveDept,CompetitionPanel pan ,WaterType waterType, String specificAnimal) {
-        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Click-click", diveDept, pan, specificAnimal);
+                   double diveDept,CompetitionPanel pan ,WaterType waterType, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, 0, "Click-click", diveDept, pan, specificAnimal, groupName, totalEnergy, energyPerMeter);
         this.waterType = waterType;
         loadImages("graphics2/dolp_east.jpg");
     }
@@ -94,15 +94,6 @@ public class Dolphin extends WaterAnimal {
         return setPosition(p);
     }
 
-    /**
-     * Returns the name of the dolphin.
-     *
-     * @return the name of the dolphin
-     */
-    @Override
-    public String getAnimaleName() {
-        return getName();
-    }
 
     /**
      * Loads the images for the dolphin based on the specified name.

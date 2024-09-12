@@ -4,34 +4,55 @@ import Graphics.CompetitionPanel;
 import Mobility.Point;
 import Olympics.Medal;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-    public abstract class WaterAnimal extends Animal {
-        private static final double MAX_DIVE = -800;
-        private double diveDept;
 
-        public WaterAnimal(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                           double animalDistance, String sound, double diveDept, CompetitionPanel pan, String specificAnimal) {
-            super(animalName, animalGender, weight, speed, medalsArray, position, animalDistance, sound, pan, "Water", specificAnimal);
-            this.diveDept = diveDept;
+public abstract class WaterAnimal extends Animal {
+    private static final double MAX_DIVE = -800;
+    private double diveDept;
+
+    public WaterAnimal(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
+                       double animalDistance, String sound, double diveDept, CompetitionPanel pan, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(animalName, animalGender, weight, speed, medalsArray, position, animalDistance, sound, pan, "Water", specificAnimal, groupName, totalEnergy, energyPerMeter);
+        this.diveDept = diveDept;
+    }
+
+    public double Dive(double dive) {
+        if (diveDept + dive < MAX_DIVE) {
+            return MAX_DIVE;
         }
+        return diveDept - dive;
+    }
 
-//        @Override
-//        public void move() {
-//            if (getEnergyLevel() <= 0) return;
-//
-//            getPosition().setX(getPosition().getX() + (int) getSpeed());
-//            setEnergyLevel(getEnergyLevel() - getEnergyPerMeter());
-//            animalDistance += getSpeed();
-//        }
+    @Override
+    public void move() {
 
-        public double Dive(double dive) {
-            if (diveDept + dive < MAX_DIVE) {
-                return MAX_DIVE;
+        Point pos = getPosition();
+        int speed = (int) getSpeed();
+        int panelWidth = pan.getBackgroundImg().getWidth();
+
+        if (getCurrentEnergy() - METER >= 0) {
+            if (orien == Orientation.east) {
+                pos.setX(pos.getX() + speed); // תנועה אופקית ימינה
+                if (pos.getX() >= (panelWidth - (panelWidth / 12 + getSize() * 2))) {
+                    pos.setX(panelWidth - (int) (panelWidth / 12) - (getSize() * 2) - getSize() / 3);
+                }
             }
-            return diveDept - dive;
+        } else {
+            return;
         }
 
-    /**
+        setCurrentEnergy(getCurrentEnergy() - (int)(((getSpeed() / METER) * getEnergyPerMeter())));
+        this.addAnimalDistance(speed);
+        setPosition(pos);
+    }
+
+
+
+
+        /**
      * Checks if this WaterAnimal object is equal to another object.
      * Two WaterAnimal objects are considered equal if they have the same attributes, including the dive depth.
      *

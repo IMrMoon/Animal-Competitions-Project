@@ -7,12 +7,15 @@ import Mobility.Point;
 import Olympics.Medal;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.InputMismatchException;
+
 
 /**
  * The Animal class is an abstract class representing a generic animal.
@@ -72,6 +75,7 @@ import java.util.InputMismatchException;
  * @see Mobile
  */
 public abstract class Animal extends Mobile implements IAnimal, IClonable, ILocatable, IMoveable, IDrawable {
+    public static int METER = 5;
     private String animalName;
 
     /**
@@ -89,11 +93,11 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
     private double speed;
     private Medal[] medalsArray = {};
     private String sound;
-    protected double animalDistance;
+    private double animalDistance;
     private int maxEnergy;
     private int energyPerMeter;
-    private int currentEnergy = 0;
-    protected int size;
+    private int currentEnergy;
+    private int size;
     private int id;
     protected Orientation orien;
     protected CompetitionPanel pan;
@@ -102,6 +106,8 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
     private double scaleY = 1.0;
     private String animalType, specificAnimal;
     private int EnergyConsumption;
+    private String groupName;
+    protected Timer timer;
 
     /**
      * Constructs a new Animal object with the specified details.
@@ -120,8 +126,8 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      */
 
     public Animal(String animalName, gender animalGender, double weight, double speed, Medal[] medalsArray, Point position,
-                  double animalDistance, String sound, CompetitionPanel pan, String animalType, String specificAnimal) {
-        super(position, 0);
+                  double animalDistance, String sound, CompetitionPanel pan, String animalType, String specificAnimal, String groupName, int totalEnergy, int energyPerMeter) {
+        super(position, animalDistance);
         this.animalName = animalName;
         this.animalGender = animalGender;
         this.weight = weight;
@@ -140,10 +146,14 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
         this.orien = Orientation.east;
         this.pan = pan;
         this.EnergyConsumption = 0;
+        this.energyPerMeter = energyPerMeter;
+        this.maxEnergy = totalEnergy;
         this.animalType = animalType;
         this.specificAnimal = specificAnimal;
-
+        this.groupName = groupName;
+        this.currentEnergy = totalEnergy;
     }
+
 
     /**
      * Constructs a new Animal object with default values.
@@ -175,6 +185,10 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
     public void setScale(double scaleX, double scaleY) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
+    }
+
+    public String getGroupName() {
+        return groupName;
     }
 
     /**
@@ -222,6 +236,10 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
         return specificAnimal;
     }
 
+    public void setOrientation(Orientation orientation) {
+        this.orien = orientation;
+    }
+
     /**
      * Sets the energy consumption.
      *
@@ -231,15 +249,34 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
         this.EnergyConsumption = energyConsumption;
     }
 
+    public void setTotalEnergy(int totalEnergy) {
+        this.EnergyConsumption = totalEnergy;
+    }
+
+    public void setCurrentEnergy(int currentEnergy) {
+        this.currentEnergy = currentEnergy;
+    }
+
+    public int getCurrentEnergy() {
+        return currentEnergy;
+    }
+
+    public void setAnimalDistance(double animalDistance) {
+        this.animalDistance = animalDistance;
+    }
+    public void addAnimalDistance(double animalDistance) {
+        this.animalDistance += animalDistance;
+    }
+
     /**
      * Sets the image for the east orientation.
      *
      * @param path The path to the image file.
      */
-    protected void setImg1(String path){
+    protected void setImg1(String path) {
         try {
             img1 = ImageIO.read(new File(path));
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Image not found");
         }
     }
@@ -249,10 +286,10 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @param path The path to the image file.
      */
-    protected void setImg2(String path){
+    protected void setImg2(String path) {
         try {
             img2 = ImageIO.read(new File(path));
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Image not found");
         }
     }
@@ -262,10 +299,10 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @param path The path to the image file.
      */
-    protected void setImg3(String path){
+    protected void setImg3(String path) {
         try {
             img3 = ImageIO.read(new File(path));
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Image not found");
         }
     }
@@ -275,10 +312,10 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @param path The path to the image file.
      */
-    protected void setImg4(String path){
+    protected void setImg4(String path) {
         try {
             img4 = ImageIO.read(new File(path));
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Image not found");
         }
     }
@@ -288,7 +325,7 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @return The image for the east orientation.
      */
-    protected BufferedImage getImg1(){
+    protected BufferedImage getImg1() {
         return img1;
     }
 
@@ -297,7 +334,7 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @return The image for the east orientation.
      */
-    protected BufferedImage getImg2(){
+    protected BufferedImage getImg2() {
         return img2;
     }
 
@@ -306,7 +343,7 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @return The image for the east orientation.
      */
-    protected BufferedImage getImg3(){
+    protected BufferedImage getImg3() {
         return img3;
     }
 
@@ -315,7 +352,7 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @return The image for the east orientation.
      */
-    protected BufferedImage getImg4(){
+    protected BufferedImage getImg4() {
         return img4;
     }
 
@@ -333,7 +370,8 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @return The name of the animal.
      */
-    public String getName() {
+    @Override
+    public String getAnimalName() {
         return animalName;
     }
 
@@ -353,6 +391,10 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      */
     protected void setSpeed(double speed) {
         this.speed = speed;
+    }
+
+    public Orientation getOrientation() {
+        return orien;
     }
 
     /**
@@ -418,16 +460,15 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
      *
      * @param g The graphics context.
      */
-    public void drawObject (Graphics g)
-    {
-        if(orien==Orientation.east) // animal move to the east side
-            g.drawImage(img1, getPosition().getX(), getPosition().getY()-size/10, size*2, size, pan);
-        else if(orien==Orientation.south) // animal move to the south side
-            g.drawImage(img2, getPosition().getX(), getPosition().getY()-size/10, size, size, pan);
-        else if(orien==Orientation.west) // animal move to the west side
-            g.drawImage(img3, getPosition().getX(), getPosition().getY()-size/10, size*2, size, pan);
-        else if(orien==Orientation.north) // animal move to the north side
-            g.drawImage(img4, getPosition().getX()-size/2, getPosition().getY()-size/10, size, size*2, pan);
+    public void drawObject(Graphics g) {
+        if (orien == Orientation.east) // animal move to the east side
+            g.drawImage(img1, getPosition().getX(), getPosition().getY() - size / 10, size * 2, size, pan);
+        else if (orien == Orientation.south) // animal move to the south side
+            g.drawImage(img2, getPosition().getX(), getPosition().getY() - size / 10, size, size * 2, pan);
+        else if (orien == Orientation.west) // animal move to the west side
+            g.drawImage(img3, getPosition().getX(), getPosition().getY() - size / 10, size * 2, size, pan);
+        else if (orien == Orientation.north) // animal move to the north side
+            g.drawImage(img4, getPosition().getX() - size / 2, getPosition().getY() - size / 10, size, size * 2, pan);
     }
 
 
@@ -473,25 +514,46 @@ public abstract class Animal extends Mobile implements IAnimal, IClonable, ILoca
     public boolean eat(int energy) {
         if (currentEnergy + energy > maxEnergy) {
             currentEnergy = maxEnergy;
-        }
-        else
+        } else {
+            setEnergyConsumption(energy);
             currentEnergy += energy;
+        }
         return true;
     }
 
     @Override
     public void move() {
-        Point pos = getPosition();
-        int speed = (int) getSpeed();
+        double currentDistance = 0;
+        Point pos = getPosition();  // קבלת המיקום הנוכחי של החיה
+        int speed = (int) getSpeed();  // מהירות החיה
 
-        int panelWidth = pan.getWidth();
+        int panelWidth = pan.getBackgroundImg().getWidth();  // רוחב הפאנל
 
-        if (orien == Orientation.east) {
-            pos.setX(pos.getX() + speed); // Increase horizontal movement
-            if (pos.getX() >= panelWidth - 350) { // גבול ימני של הפאנל
-                pos.setX(panelWidth - 350);
+        // בדיקת האם יש מספיק אנרגיה לתנועה
+        if (currentEnergy - (int)((getSpeed() / METER) * getEnergyPerMeter()) >= 0) {
+            if (orien == Orientation.east) {  // תנועה בכיוון מזרח
+                pos.setX(pos.getX() + speed);  // הוספת המהירות למיקום האופקי
+
+                // בדיקת האם החיה חרגה מגבול הפאנל הימני
+                if (pos.getX() >= panelWidth - (getSize() * 2)) {
+                    pos.setX(panelWidth - (getSize() * 2));  // הגבלת המיקום לגבול הפאנל
+                }
+            } else {
+                return;  // אם הכיוון אינו מזרח, התנועה לא מתבצעת
             }
+        } else {
+            return;  // אם אין מספיק אנרגיה, התנועה לא מתבצעת
         }
+
+        // עדכון האנרגיה הנוכחית לאחר התנועה
+        setCurrentEnergy(getCurrentEnergy() - (int)(((getSpeed() / METER) * getEnergyPerMeter())));
+
+        // חישוב המרחק שהחיה עברה
+        currentDistance = calcDistance(pos);
+        addAnimalDistance(currentDistance);
+
+        // עדכון המיקום הנוכחי של החיה
         setPosition(pos);
     }
+
 }
